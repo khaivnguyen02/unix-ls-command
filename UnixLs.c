@@ -6,7 +6,8 @@
 
 int main() {
     char command[MAX_COMMAND_LENGTH];
-    char cmd[128];
+    char dir[1024];
+    int list_long, show_inode;
 
     while (1) {
         printf("$ ");  // Prompt for input
@@ -24,12 +25,22 @@ int main() {
         }
 
         // Validate and build the ls command
-        int l = 0;
-        int i = 0;
-        for (int j = 2; j < 6; ++j) {
-            if (command[j] == 'l') l = 1;
-            else if (command[j] == 'i') i = 1;
+        list_long = 0;
+        show_inode = 0;
+
+        char *options = strstr(command, "-");
+        if (options) {
+            for (int i = 1; options[i] != ' ' && options[i] != '\0'; i++) {
+                if (options[i] == 'l') list_long = 1;
+                if (options[i] == 'i') show_inode = 1;
+            }
         }
+
+        if (!options) { // No options provided
+            strcpy(dir, "."); // Default to current directory
+        }
+
+        simulate_ls(dir, list_long, show_inode);
     }
 
     printf("Exiting SimpleShell.\n");
