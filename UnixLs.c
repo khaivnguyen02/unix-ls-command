@@ -20,13 +20,14 @@ char *formatDate(time_t time);
 int main(int argc, char *argv[])
 {
     int inodeFlag = 0, longFlag = 0;
-    char *path = ".";   // Default path is current working directory
+    int dirCount = 0;
 
-    // Parse command-line arguments for -i, -l, or both (-il or -li)
+    // Parse options
     for (int i = 1; i < argc; i++)
     {
         if (argv[i][0] == '-')
         {
+            // This is an option
             for (int j = 1; argv[i][j] != '\0'; j++)
             {
                 if (argv[i][j] == 'i')
@@ -41,11 +42,35 @@ int main(int argc, char *argv[])
         }
         else
         {
-            path = argv[i];
+            // This is not an option ==> a directory (or file)
+            dirCount++;
         }
     }
 
-    listDirectory(path, inodeFlag, longFlag);
+    if (dirCount == 0)
+    {
+        listDirectory(".", inodeFlag, longFlag);
+    }
+    else
+    {
+        // Process each directory
+        for (int i = 1; i < argc; i++)
+        {
+            if (argv[i][0] != '-')
+            {
+                // Skip options
+                if (dirCount > 1)
+                {
+                    printf("%s:\n", argv[i]);
+                }
+                listDirectory(argv[i], inodeFlag, longFlag);
+                if (i < argc - 1)
+                {
+                    printf("\n"); // Print a new line between directory listings
+                }
+            }
+        }
+    }
 
     return 0;
 }
